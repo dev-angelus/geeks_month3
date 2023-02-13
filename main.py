@@ -1,62 +1,26 @@
+
 from aiogram import Bot, Dispatcher, executor, types
-from dotenv import load_dotenv
-from os import getenv
-import random
+from aiogram.dispatcher.filters import Text
+from config import dp
+from handlers.basic import (start, help, myinfo, picture)
+from handlers.products import (show_products,shoes)
 
-load_dotenv()
-bot = Bot(token=getenv('BOT_TOKEN'))
-dp = Dispatcher(bot)
 
-@dp.message_handler(commands=["start"])
-async def start(message:types.Message):
-    user = message.from_user.full_name
-    await message.answer(
-        f'Hello, {user}!'
-    )
+# from dotenv import load_dotenv
+# from os import getenv
+# import random
 
-@dp.message_handler(commands=["help"])
-async def help(message: types.Message):
-    await message.answer(
-        """
-        /start - приветствие
-        /help - список команд
-        /myinfo - данные пользователя
-        /picture - картинка из папки images
-        """
-    )
-@dp.message_handler(commands=["myinfo"])
-async def myinfo(message: types.Message):
-    user = message.from_user.full_name
-    user_id = message.from_user.id
-    first_name = message.from_user.first_name
-    last_name = message.from_user.last_name
-    await message.answer(
-        f'Username: {user}\n'
-        f'User ID: {user_id}\n'
-        f'User first name: {first_name}\n'
-        f'User last name: {last_name}\n'
-    )
-    # await message.delete()
-@dp.message_handler(commands=["picture"])
-async def picture(message: types.Message):
-    photos = ['/images_cat/cat.webp','/images_cat/snowleo.jpeg','/images_cat/cheetah.jpeg','/images_cat/jaguar.jpeg']
-    with open(random.choice(photos), 'rb') as photos:
-        await message.answer_photo(
-            photo = photos,
-            caption = 'cat family'
-        )
 
-@dp.message_handler()
-async def echo(message: types.Message):
-    text = len(message.text)
-    if text>3:
-        await message.answer(
-            f'{message.text.upper()}'
-        )
-    else:
-        pass
-
-executor.start_polling(dp)
+if __name__=="__main__":
+    print(__name__)
+    dp.register_message_handler(start, commands=["start"])
+    dp.register_message_handler(help, commands=["help"])
+    dp.register_message_handler(myinfo, commands=["myinfo"])
+    dp.register_message_handler(picture, commands=["picture"])
+    dp.register_message_handler(show_products, commands=["products"])
+    dp.register_message_handler(shoes, Text(startswith="Kids shoes"))
+    dp.register_callback_query_handler(show_products, Text(equals="Welcome!"))
+    executor.start_polling(dp)
 
 
 
